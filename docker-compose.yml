@@ -5,10 +5,17 @@ services:
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./data/telemetry:/data/telemetry
     ports:
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4318"   # OTLP HTTP receiver
       - "8889:8889"   # Prometheus metrics
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "100"
+        compress: "false"
     depends_on:
       - prometheus
 
@@ -43,6 +50,27 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
       - prometheus
+
+  # Telemetry Exporter (自動エクスポート用)
+  exporter:
+    image: python:3.11-alpine
+    container_name: telemetry-exporter
+    volumes:
+      - ./scripts:/scripts
+      - ./data:/data
+    command: >
+      sh -c "
+        echo 'Installing dependencies...' &&
+        pip install --no-cache-dir requests &&
+        apk add --no-cache dcron &&
+        mkdir -p /data/logs &&
+        echo '0 * * * * cd /scripts && python3 export_metrics.py >> /data/logs/export.log 2>&1' > /etc/crontabs/root &&
+        echo 'Cron job installed. Starting crond...' &&
+        crond -f -l 2
+      "
+    depends_on:
+      - prometheus
+    restart: unless-stopped
 
 volumes:
   prometheus_data:

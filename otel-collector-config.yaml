@@ -20,11 +20,12 @@ exporters:
     send_timestamps: true
     metric_expiration: 180m
     enable_open_metrics: true
-    
+
+  # デバッグエクスポーター（ログ出力用）
   debug:
     verbosity: detailed
-    sampling_initial: 5
-    sampling_thereafter: 200
+    sampling_initial: 100000  # 最初の100000件を全て記録
+    sampling_thereafter: 1    # その後も全て記録
 
 service:
   pipelines:

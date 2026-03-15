@@ -1,0 +1,34 @@
+# テレメトリデータ（個人情報含む）
+data/telemetry/*.jsonl
+data/telemetry/*.jsonl.gz
+
+# ログファイル
+data/logs/
+
+# Prometheus & Grafana データ
+prometheus_data/
+grafana_data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 環境変数
+.env
+.env.local
